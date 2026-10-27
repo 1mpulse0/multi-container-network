@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 40px 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        .status {
+            color: #15803d;
+            margin-bottom: 20px;
+        }
+
+        .user {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 8px;
+        }
+
+        .user h3 {
+            margin: 0 0 8px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #message {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>User Dashboard</h1>
+        <p class="status">Frontend connected through Docker</p>
+
+        <button onclick="loadUsers()">Refresh Users</button>
+
+        <p id="message">Loading users...</p>
+        <div id="users"></div>
+    </div>
+
+    <script>
+        async function loadUsers() {
+            const message = document.getElementById("message");
+            const usersContainer = document.getElementById("users");
+
+            message.textContent = "Loading users...";
+            usersContainer.innerHTML = "";
+
+            try {
+                const response = await fetch("/api/users");
+
+                if (!response.ok) {
+                    throw new Error("HTTP error: " + response.status);
+                }
+
+                const users = await response.json();
+
+                message.textContent =
+                    "Users loaded successfully: " + users.length;
+
+                users.forEach(user => {
+                    const card = document.createElement("div");
+                    card.className = "user";
+
+                    const name = document.createElement("h3");
+                    name.textContent = user.name;
+
+                    const email = document.createElement("p");
+                    email.textContent = "Email: " + user.email;
+
+                    const id = document.createElement("small");
+                    id.textContent = "User ID: " + user.id;
+
+                    card.append(name, email, id);
+                    usersContainer.appendChild(card);
+                });
+
+            } catch (error) {
+                message.textContent =
+                    "Could not load users. Please try again.";
+                console.error(error);
+            }
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>
